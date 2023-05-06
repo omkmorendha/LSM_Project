@@ -40,7 +40,6 @@ int BPF_PROG(handle_cred_prepare, struct cred *new, const struct cred *old, gfp_
     kernel_cap_t caps;
     int syscall;
     unsigned long flags;
-
     
     if (ret) {
         return ret;
@@ -49,8 +48,8 @@ int BPF_PROG(handle_cred_prepare, struct cred *new, const struct cred *old, gfp_
     task = bpf_get_current_task_btf();
     regs = (struct pt_regs *) bpf_task_pt_regs(task);
     
-    syscall = regs->orig_ax;
-    caps = task->cred->cap_effective;
+    syscall = regs -> orig_ax;
+    caps = task -> cred-> cap_effective;
 
     if (syscall != UNSHARE_SYSCALL) {
         return 0;
@@ -62,7 +61,7 @@ int BPF_PROG(handle_cred_prepare, struct cred *new, const struct cred *old, gfp_
         return 0;
     }
 
-    // Allow tasks with CAP_SYS_ADMIN to unshare (already root)
+    // if CAP_SYS_ADMIN is enabled then allow unshare (already root)
     if (caps.cap[CAP_TO_INDEX(CAP_SYS_ADMIN)] & CAP_TO_MASK(CAP_SYS_ADMIN)) {
         return 0;
     }
